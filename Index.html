@@ -7,27 +7,31 @@
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background-color: #A8D5BA; /* Corregido: había ## */
+      background-color: #a8d5ba; /* Verde claro armónico */
       margin: 0;
       padding: 1rem;
       color: #333;
     }
+
     h1 {
       text-align: center;
       color: #266040;
     }
+
     .malla {
       display: flex;
       flex-direction: column;
       gap: 2rem;
       margin-top: 2rem;
     }
+
     .fila {
       display: flex;
       justify-content: center;
       gap: 1rem;
       flex-wrap: wrap;
     }
+
     .semestre {
       flex: 1;
       background-color: #e8f5e9;
@@ -35,31 +39,61 @@
       border-radius: 8px;
       padding: 1rem;
       min-width: 200px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
+
     .semestre h2 {
       text-align: center;
       color: #266040;
     }
+
     .ramo {
-      background-color: #abf8a6;
+      background-color: #c7f2c2;
       margin: 0.5rem 0;
       padding: 0.5rem;
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.3s ease;
       position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
     }
+
     .ramo:hover {
-      background-color: #abf8a6;
+      background-color: #b2e6ab;
     }
+
     .ramo.aprobado {
       background-color: #bee0ca;
       text-decoration: line-through;
     }
+
     .ramo.bloqueado {
       background-color: #5e945a;
       cursor: not-allowed;
+      color: white;
     }
+
+    .promedio-input {
+      width: 3.5rem;
+      border: 1px solid #266040;
+      border-radius: 4px;
+      padding: 0.2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      background-color: #f7fff8;
+    }
+
+    .promedio-aprobado {
+      background-color: #d8f5d1 !important;
+    }
+
+    .promedio-reprobado {
+      background-color: #ffcccc !important;
+    }
+
     .tooltip {
       visibility: hidden;
       background-color: #333;
@@ -75,7 +109,10 @@
       opacity: 0;
       transition: opacity 0.3s;
       font-size: 0.8rem;
+      width: max-content;
+      max-width: 180px;
     }
+
     .ramo:hover .tooltip {
       visibility: visible;
       opacity: 1;
@@ -103,14 +140,12 @@
       { id: "bioquimica", nombre: "Bioquímica", semestre: 2, prereq: ["quimica", "biocel"] },
       { id: "histo", nombre: "Histología y Embriología", semestre: 2, prereq: [] },
       { id: "ciudadania", nombre: "Ciudadanía para el buen vivir", semestre: 2, prereq: [] },
-
       { id: "economia", nombre: "Economía y fundamentos de la administración pecuaria", semestre: 3, prereq: [] },
       { id: "anato_II", nombre: "Anatomía Animal II", semestre: 3, prereq: ["anato"] },
       { id: "bioestadistica", nombre: "Bioestadística", semestre: 3, prereq: ["matematicas"] },
       { id: "bioetica", nombre: "Bioética", semestre: 3, prereq: [] },
       { id: "fisio_animal", nombre: "Fisiología Animal", semestre: 3, prereq: ["histo"] },
       { id: "ingles_I", nombre: "Inglés I", semestre: 3, prereq: [] },
-
       { id: "epidemiologia", nombre: "Epidemiología", semestre: 4, prereq: ["bioestadistica"] },
       { id: "nutricion", nombre: "Nutrición Animal", semestre: 4, prereq: [] },
       { id: "fisiopatologia", nombre: "Fisiopatología", semestre: 4, prereq: ["fisio_animal"] },
@@ -118,14 +153,12 @@
       { id: "inmunologia", nombre: "Inmunología", semestre: 4, prereq: ["bioquimica"] },
       { id: "genetica", nombre: "Genética", semestre: 4, prereq: ["bioestadistica"] },
       { id: "ingles_II", nombre: "Inglés II", semestre: 4, prereq: ["ingles_I"] },
-
       { id: "alimentacion", nombre: "Alimentación Animal", semestre: 5, prereq: ["nutricion"] },
       { id: "microbiologia", nombre: "Microbiología", semestre: 5, prereq: ["inmunologia"] },
       { id: "pato_siste", nombre: "Patología Sistémica", semestre: 5, prereq: ["fisiopatologia"] },
       { id: "reproduccion", nombre: "Reproducción Animal", semestre: 5, prereq: ["genetica"] },
-      { id: "farmacologia", nombre: "Farmacología", semestre: 5, prereq: ["zoo"] },  
-      { id: "parasitologia", nombre: "Parasitología", semestre: 5, prereq: ["fisiopatologia"] }, 
-
+      { id: "farmacologia", nombre: "Farmacología", semestre: 5, prereq: ["zoo"] },
+      { id: "parasitologia", nombre: "Parasitología", semestre: 5, prereq: ["fisiopatologia"] },
       { id: "poligastrico", nombre: "Producción Poligástricos", semestre: 6, prereq: ["alimentacion"] },
       { id: "monogastrico", nombre: "Producción Monogástricos", semestre: 6, prereq: ["alimentacion"] },
       { id: "imagenologia", nombre: "Imagenología", semestre: 6, prereq: ["anato_II"] },
@@ -133,7 +166,6 @@
       { id: "laboratorio", nombre: "Laboratorio Clínico", semestre: 6, prereq: ["inmunologia"] },
       { id: "tecnologia", nombre: "Tecnología e inocuidad de los alimentos de origen animal", semestre: 6, prereq: [] },
       { id: "electivo_I", nombre: "Electivo Formación Integral", semestre: 6, prereq: [] },
-
       { id: "acuicola", nombre: "Producción Acuícola", semestre: 7, prereq: ["genetica"] },
       { id: "ia", nombre: "Inteligencia Artificial e Innovación Tecnológica en Medicina Veterinaria", semestre: 7, prereq: [] },
       { id: "metodologia", nombre: "Metodología de la Investigación", semestre: 7, prereq: ["bioestadistica"] },
@@ -141,18 +173,15 @@
       { id: "med_interna", nombre: "Medicina Interna", semestre: 7, prereq: ["semiologia", "laboratorio"] },
       { id: "zoonosis", nombre: "Salud Pública y Zoonosis", semestre: 7, prereq: ["epidemiologia"] },
       { id: "electivo_II", nombre: "Electivo Formación Integral", semestre: 7, prereq: [] },
-
       { id: "patologia", nombre: "Patología Acuícola", semestre: 8, prereq: ["acuicola"] },
       { id: "seminario", nombre: "Seminario de Investigación", semestre: 8, prereq: ["metodologia"] },
-      { id: "menores", nombre: "Clínica Animales Menores", semestre: 8, prereq: ["cirugia", "med_interna"]},
-      { id: "mayores", nombre: "Clínica Animales Mayores", semestre: 8, prereq: ["cirugia", "med_interna"]},
+      { id: "menores", nombre: "Clínica Animales Menores", semestre: 8, prereq: ["cirugia", "med_interna"] },
+      { id: "mayores", nombre: "Clínica Animales Mayores", semestre: 8, prereq: ["cirugia", "med_interna"] },
       { id: "gestion", nombre: "Gestión Veterinaria", semestre: 8, prereq: ["economia"] },
-
       { id: "titulacion_I", nombre: "Trabajo de Titulación I", semestre: 9, prereq: ["seminario"] },
       { id: "internado_I", nombre: "Internado I", semestre: 9, prereq: ["mayores", "menores"] },
       { id: "profundizacion_1", nombre: "Electivo de Profundización 1", semestre: 9, prereq: [] },
       { id: "profundizacion_2", nombre: "Electivo de Profundización 2", semestre: 9, prereq: [] },
-
       { id: "titulacion_II", nombre: "Trabajo de Titulación II", semestre: 10, prereq: ["titulacion_I"] },
       { id: "internado_II", nombre: "Internado II", semestre: 10, prereq: ["internado_I"] },
       { id: "profundizacion_3", nombre: "Electivo de Profundización 3", semestre: 10, prereq: [] }
@@ -164,6 +193,7 @@
     function guardarEstado() {
       localStorage.setItem("estadoRamos", JSON.stringify(estado));
     }
+
     function guardarPromedios() {
       localStorage.setItem("promediosRamos", JSON.stringify(promedios));
     }
@@ -247,8 +277,13 @@
       const cont = document.createElement("div");
       cont.className = "semestre";
       cont.innerHTML = `<h2>Semestre ${s}</h2>`;
-      ramos.filter(r => r.semestre === s).forEach(r => cont.appendChild(crearRamo(r)));
-      (s % 2 === 1 ? document.getElementById("fila-superior") : document.getElementById("fila-inferior")).appendChild(cont);
+      ramos
+        .filter(r => r.semestre === s)
+        .forEach(r => cont.appendChild(crearRamo(r)));
+      (s % 2 === 1
+        ? document.getElementById("fila-superior")
+        : document.getElementById("fila-inferior")
+      ).appendChild(cont);
     }
 
     actualizarBloqueos();
