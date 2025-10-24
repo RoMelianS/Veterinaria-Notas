@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Malla Medicina Veterinaria - Universidad de Los Lagos</title>
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background-color: #e8f5e9;
+      background-color: #A8D5BA;
       margin: 0;
       padding: 1rem;
       color: #333;
@@ -30,19 +30,18 @@
     }
     .semestre {
       flex: 1;
-      background-color: #f1fff2;
-      border: 2px solid #4caf50;
+      background-color: #e8f5e9;
+      border: 2px solid #266040;
       border-radius: 8px;
       padding: 1rem;
       min-width: 220px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     .semestre h2 {
       text-align: center;
       color: #266040;
     }
     .ramo {
-      background-color: #c8e6c9;
+      background-color: #b6f2b2;
       margin: 0.5rem 0;
       padding: 0.5rem;
       border-radius: 4px;
@@ -54,16 +53,15 @@
       align-items: center;
     }
     .ramo:hover {
-      background-color: #a5d6a7;
+      background-color: #abf8a6;
     }
     .ramo.aprobado {
-      background-color: #dcedc8;
+      background-color: #c6eecb;
       text-decoration: line-through;
     }
     .ramo.bloqueado {
-      background-color: #b0b0b0;
+      background-color: #6da66d;
       cursor: not-allowed;
-      opacity: 0.7;
     }
     .tooltip {
       visibility: hidden;
@@ -74,13 +72,12 @@
       padding: 5px;
       position: absolute;
       z-index: 1;
-      top: 100%;
+      bottom: 100%;
       left: 50%;
       transform: translateX(-50%);
       opacity: 0;
       transition: opacity 0.3s;
       font-size: 0.8rem;
-      white-space: nowrap;
     }
     .ramo:hover .tooltip {
       visibility: visible;
@@ -95,12 +92,10 @@
       border: 1px solid #ccc;
     }
     .promedio-aprobado {
-      color: #1b5e20;
-      background-color: #c8e6c9;
+      color: #2e7d32;
     }
     .promedio-reprobado {
-      color: #b71c1c;
-      background-color: #ffcdd2;
+      color: #c62828;
     }
   </style>
 </head>
@@ -171,8 +166,12 @@
     const estado = JSON.parse(localStorage.getItem("estadoRamos") || "{}");
     const promedios = JSON.parse(localStorage.getItem("promediosRamos") || "{}");
 
-    function guardarEstado() { localStorage.setItem("estadoRamos", JSON.stringify(estado)); }
-    function guardarPromedios() { localStorage.setItem("promediosRamos", JSON.stringify(promedios)); }
+    function guardarEstado() {
+      localStorage.setItem("estadoRamos", JSON.stringify(estado));
+    }
+    function guardarPromedios() {
+      localStorage.setItem("promediosRamos", JSON.stringify(promedios));
+    }
 
     function actualizarColorPromedio(input) {
       const valor = parseFloat(input.value);
@@ -184,34 +183,26 @@
     }
 
     function estaAprobado(id) {
-      return parseFloat(promedios[id]) >= 4.0;
+      return estado[id] && parseFloat(promedios[id]) >= 4.0;
     }
 
     function actualizarBloqueos() {
-      let cambios;
-      do {
-        cambios = false;
-        document.querySelectorAll(".ramo").forEach(div => {
-          const id = div.dataset.id;
-          const ramo = ramos.find(r => r.id === id);
-          div.classList.remove("bloqueado", "aprobado");
-          const tooltipExistente = div.querySelector(".tooltip");
-          if (tooltipExistente) tooltipExistente.remove();
-          if (!promedios[id]) promedios[id] = "";
+      document.querySelectorAll(".ramo").forEach(div => {
+        const id = div.dataset.id;
+        const ramo = ramos.find(r => r.id === id);
+        div.classList.remove("bloqueado", "aprobado");
+        const tooltipExistente = div.querySelector(".tooltip");
+        if (tooltipExistente) tooltipExistente.remove();
 
-          if (estaAprobado(id)) {
-            if (!estado[id]) { estado[id] = true; cambios = true; }
-            div.classList.add("aprobado");
-          } else if (ramo.prereq.some(p => !estaAprobado(p))) {
-            div.classList.add("bloqueado");
-            const tooltip = document.createElement("div");
-            tooltip.className = "tooltip";
-            tooltip.textContent = "Falta aprobar: " + ramo.prereq.filter(p => !estaAprobado(p)).join(", ");
-            div.appendChild(tooltip);
-          }
-        });
-      } while (cambios);
-      guardarEstado();
+        if (estaAprobado(id)) div.classList.add("aprobado");
+        else if (ramo.prereq.some(p => !estaAprobado(p))) {
+          div.classList.add("bloqueado");
+          const tooltip = document.createElement("div");
+          tooltip.className = "tooltip";
+          tooltip.textContent = "Falta aprobar: " + ramo.prereq.filter(p => !estaAprobado(p)).join(", ");
+          div.appendChild(tooltip);
+        }
+      });
     }
 
     function crearRamo(ramo) {
@@ -258,9 +249,8 @@
       cont.className = "semestre";
       cont.innerHTML = `<h2>Semestre ${s}</h2>`;
       ramos.filter(r => r.semestre === s).forEach(r => cont.appendChild(crearRamo(r)));
-      const fila = s <= 5 ? document.getElementById("fila-superior") : document.getElementById("fila-inferior");
-      fila.appendChild(cont);
-    }
+     const fila = s <= 5 ? document.getElementById("fila-superior") : document.getElementById("fila-inferior");
+fila.appendChild(cont);
 
     actualizarBloqueos();
   </script>
