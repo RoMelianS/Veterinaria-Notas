@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malla Medicina Veterinaria - Universidad de Los Lagos</title>
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background-color: #A8D5BA;
+      background-color: #e8f5e9;
       margin: 0;
       padding: 1rem;
       color: #333;
@@ -30,18 +30,19 @@
     }
     .semestre {
       flex: 1;
-      background-color: #e8f5e9;
-      border: 2px solid #266040;
+      background-color: #f1fff2;
+      border: 2px solid #4caf50;
       border-radius: 8px;
       padding: 1rem;
       min-width: 220px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     .semestre h2 {
       text-align: center;
       color: #266040;
     }
     .ramo {
-      background-color: #b6f2b2;
+      background-color: #c8e6c9;
       margin: 0.5rem 0;
       padding: 0.5rem;
       border-radius: 4px;
@@ -53,15 +54,16 @@
       align-items: center;
     }
     .ramo:hover {
-      background-color: #abf8a6;
+      background-color: #a5d6a7;
     }
     .ramo.aprobado {
-      background-color: #c6eecb;
+      background-color: #dcedc8;
       text-decoration: line-through;
     }
     .ramo.bloqueado {
       background-color: #6da66d;
       cursor: not-allowed;
+      opacity: 0.7;
     }
     .tooltip {
       visibility: hidden;
@@ -72,12 +74,13 @@
       padding: 5px;
       position: absolute;
       z-index: 1;
-      bottom: 100%;
+      top: 100%;
       left: 50%;
       transform: translateX(-50%);
       opacity: 0;
       transition: opacity 0.3s;
       font-size: 0.8rem;
+      white-space: nowrap;
     }
     .ramo:hover .tooltip {
       visibility: visible;
@@ -92,10 +95,12 @@
       border: 1px solid #ccc;
     }
     .promedio-aprobado {
-      color: #2e7d32;
+      color: #1b5e20;
+      background-color: #c8e6c9;
     }
     .promedio-reprobado {
-      color: #c62828;
+      color: #b71c1c;
+      background-color: #ffcdd2;
     }
   </style>
 </head>
@@ -172,7 +177,6 @@
     function guardarPromedios() {
       localStorage.setItem("promediosRamos", JSON.stringify(promedios));
     }
-
     function actualizarColorPromedio(input) {
       const valor = parseFloat(input.value);
       input.classList.remove("promedio-aprobado", "promedio-reprobado");
@@ -181,11 +185,9 @@
         else input.classList.add("promedio-reprobado");
       }
     }
-
     function estaAprobado(id) {
       return estado[id] && parseFloat(promedios[id]) >= 4.0;
     }
-
     function actualizarBloqueos() {
       document.querySelectorAll(".ramo").forEach(div => {
         const id = div.dataset.id;
@@ -193,6 +195,7 @@
         div.classList.remove("bloqueado", "aprobado");
         const tooltipExistente = div.querySelector(".tooltip");
         if (tooltipExistente) tooltipExistente.remove();
+        if (!promedios[id]) promedios[id] = "";
 
         if (estaAprobado(id)) div.classList.add("aprobado");
         else if (ramo.prereq.some(p => !estaAprobado(p))) {
@@ -204,7 +207,6 @@
         }
       });
     }
-
     function crearRamo(ramo) {
       const div = document.createElement("div");
       div.className = "ramo";
@@ -244,16 +246,17 @@
       return div;
     }
 
+    // Ordena los semestres: 1-5 arriba, 6-10 abajo
     for (let s = 1; s <= 10; s++) {
       const cont = document.createElement("div");
       cont.className = "semestre";
       cont.innerHTML = `<h2>Semestre ${s}</h2>`;
       ramos.filter(r => r.semestre === s).forEach(r => cont.appendChild(crearRamo(r)));
-      (s % 2 === 1 ? document.getElementById("fila-superior") : document.getElementById("fila-inferior")).appendChild(cont);
+      const fila = s <= 5 ? document.getElementById("fila-superior") : document.getElementById("fila-inferior");
+      fila.appendChild(cont);
     }
 
     actualizarBloqueos();
   </script>
 </body>
 </html>
-
