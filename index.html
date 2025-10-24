@@ -15,7 +15,23 @@
     .ramo:hover { background-color:#a5d6a7; }
     .ramo.aprobado { background-color:#dcedc8; text-decoration:line-through; }
     .ramo.bloqueado { background-color:#6da66d; cursor:not-allowed; opacity:0.7; }
-    .tooltip { visibility:hidden; background-color:#333; color:#fff; text-align:center; border-radius:6px; padding:5px; position:absolute; z-index:1; top:100%; left:50%; transform:translateX(-50%); opacity:0; transition:opacity 0.3s; font-size:0.8rem; white-space:nowrap; }
+    .tooltip { 
+      visibility:hidden; 
+      background-color:#333; 
+      color:#fff; 
+      text-align:left; 
+      border-radius:6px; 
+      padding:5px 8px; 
+      position:absolute; 
+      z-index:1; 
+      top:100%; 
+      left:50%; 
+      transform:translateX(-50%); 
+      opacity:0; 
+      transition:opacity 0.3s; 
+      font-size:0.8rem; 
+      white-space:nowrap; 
+    }
     .ramo:hover .tooltip { visibility:visible; opacity:1; }
     .promedio-input { width:50px; font-size:0.9rem; text-align:center; font-weight:bold; border-radius:4px; border:1px solid #ccc; }
     .promedio-aprobado { color:#1b5e20; background-color:#c8e6c9; }
@@ -101,11 +117,8 @@
       }
     }
 
-    function estaAprobado(id) {
-      return parseFloat(promedios[id]) >= 4.0;
-    }
+    function estaAprobado(id) { return parseFloat(promedios[id]) >= 4.0; }
 
-    // Desbloqueo en cascada
     function actualizarBloqueos() {
       let cambios;
       do {
@@ -118,15 +131,22 @@
           if (tooltipExistente) tooltipExistente.remove();
           if (!promedios[id]) promedios[id] = "";
 
+          // Tooltip que muestra prerequisitos
+          if (ramo.prereq.length > 0) {
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.innerHTML = "Prerrequisitos: " + ramo.prereq.map(p => {
+              const r = ramos.find(x => x.id === p);
+              return r ? r.nombre : p;
+            }).join(", ");
+            div.appendChild(tooltip);
+          }
+
           if (estaAprobado(id)) {
             if (!estado[id]) { estado[id] = true; cambios = true; }
             div.classList.add("aprobado");
           } else if (ramo.prereq.some(p => !estaAprobado(p))) {
             div.classList.add("bloqueado");
-            const tooltip = document.createElement("div");
-            tooltip.className = "tooltip";
-            tooltip.textContent = "Falta aprobar: " + ramo.prereq.filter(p => !estaAprobado(p)).join(", ");
-            div.appendChild(tooltip);
           }
         });
       } while (cambios);
