@@ -1,102 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Malla Medicina Veterinaria - Universidad de Los Lagos</title>
   <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: #A8D5BA;
-      margin: 0;
-      padding: 1rem;
-      color: #333;
-    }
-    h1 {
-      text-align: center;
-      color: #266040;
-    }
-    .malla {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-    .fila {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .semestre {
-      flex: 1;
-      background-color: #e8f5e9;
-      border: 2px solid #266040;
-      border-radius: 8px;
-      padding: 1rem;
-      min-width: 220px;
-    }
-    .semestre h2 {
-      text-align: center;
-      color: #266040;
-    }
-    .ramo {
-      background-color: #b6f2b2;
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .ramo:hover {
-      background-color: #abf8a6;
-    }
-    .ramo.aprobado {
-      background-color: #c6eecb;
-      text-decoration: line-through;
-    }
-    .ramo.bloqueado {
-      background-color: #6da66d;
-      cursor: not-allowed;
-    }
-    .tooltip {
-      visibility: hidden;
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px;
-      position: absolute;
-      z-index: 1;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 0.8rem;
-    }
-    .ramo:hover .tooltip {
-      visibility: visible;
-      opacity: 1;
-    }
-    .promedio-input {
-      width: 50px;
-      font-size: 0.9rem;
-      text-align: center;
-      font-weight: bold;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    .promedio-aprobado {
-      color: #2e7d32;
-    }
-    .promedio-reprobado {
-      color: #c62828;
-    }
+    body { font-family: "Segoe UI", sans-serif; background-color: #e8f5e9; margin:0; padding:1rem; color:#333; }
+    h1 { text-align:center; color:#266040; }
+    .malla { display:flex; flex-direction:column; gap:2rem; margin-top:2rem; }
+    .fila { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; }
+    .semestre { flex:1; background-color:#f1fff2; border:2px solid #4caf50; border-radius:8px; padding:1rem; min-width:220px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .semestre h2 { text-align:center; color:#266040; }
+    .ramo { background-color:#c8e6c9; margin:0.5rem 0; padding:0.5rem; border-radius:4px; cursor:pointer; transition: background-color 0.3s ease; position:relative; display:flex; justify-content:space-between; align-items:center; }
+    .ramo:hover { background-color:#a5d6a7; }
+    .ramo.aprobado { background-color:#dcedc8; text-decoration:line-through; }
+    .ramo.bloqueado { background-color:#6da66d; cursor:not-allowed; opacity:0.7; }
+    .tooltip { visibility:hidden; background-color:#333; color:#fff; text-align:center; border-radius:6px; padding:5px; position:absolute; z-index:1; top:100%; left:50%; transform:translateX(-50%); opacity:0; transition:opacity 0.3s; font-size:0.8rem; white-space:nowrap; }
+    .ramo:hover .tooltip { visibility:visible; opacity:1; }
+    .promedio-input { width:50px; font-size:0.9rem; text-align:center; font-weight:bold; border-radius:4px; border:1px solid #ccc; }
+    .promedio-aprobado { color:#1b5e20; background-color:#c8e6c9; }
+    .promedio-reprobado { color:#b71c1c; background-color:#ffcdd2; }
   </style>
 </head>
 <body>
@@ -166,12 +89,8 @@
     const estado = JSON.parse(localStorage.getItem("estadoRamos") || "{}");
     const promedios = JSON.parse(localStorage.getItem("promediosRamos") || "{}");
 
-    function guardarEstado() {
-      localStorage.setItem("estadoRamos", JSON.stringify(estado));
-    }
-    function guardarPromedios() {
-      localStorage.setItem("promediosRamos", JSON.stringify(promedios));
-    }
+    function guardarEstado() { localStorage.setItem("estadoRamos", JSON.stringify(estado)); }
+    function guardarPromedios() { localStorage.setItem("promediosRamos", JSON.stringify(promedios)); }
 
     function actualizarColorPromedio(input) {
       const valor = parseFloat(input.value);
@@ -183,26 +102,35 @@
     }
 
     function estaAprobado(id) {
-      return estado[id] && parseFloat(promedios[id]) >= 4.0;
+      return parseFloat(promedios[id]) >= 4.0;
     }
 
+    // Desbloqueo en cascada
     function actualizarBloqueos() {
-      document.querySelectorAll(".ramo").forEach(div => {
-        const id = div.dataset.id;
-        const ramo = ramos.find(r => r.id === id);
-        div.classList.remove("bloqueado", "aprobado");
-        const tooltipExistente = div.querySelector(".tooltip");
-        if (tooltipExistente) tooltipExistente.remove();
+      let cambios;
+      do {
+        cambios = false;
+        document.querySelectorAll(".ramo").forEach(div => {
+          const id = div.dataset.id;
+          const ramo = ramos.find(r => r.id === id);
+          div.classList.remove("bloqueado", "aprobado");
+          const tooltipExistente = div.querySelector(".tooltip");
+          if (tooltipExistente) tooltipExistente.remove();
+          if (!promedios[id]) promedios[id] = "";
 
-        if (estaAprobado(id)) div.classList.add("aprobado");
-        else if (ramo.prereq.some(p => !estaAprobado(p))) {
-          div.classList.add("bloqueado");
-          const tooltip = document.createElement("div");
-          tooltip.className = "tooltip";
-          tooltip.textContent = "Falta aprobar: " + ramo.prereq.filter(p => !estaAprobado(p)).join(", ");
-          div.appendChild(tooltip);
-        }
-      });
+          if (estaAprobado(id)) {
+            if (!estado[id]) { estado[id] = true; cambios = true; }
+            div.classList.add("aprobado");
+          } else if (ramo.prereq.some(p => !estaAprobado(p))) {
+            div.classList.add("bloqueado");
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.textContent = "Falta aprobar: " + ramo.prereq.filter(p => !estaAprobado(p)).join(", ");
+            div.appendChild(tooltip);
+          }
+        });
+      } while (cambios);
+      guardarEstado();
     }
 
     function crearRamo(ramo) {
@@ -249,8 +177,9 @@
       cont.className = "semestre";
       cont.innerHTML = `<h2>Semestre ${s}</h2>`;
       ramos.filter(r => r.semestre === s).forEach(r => cont.appendChild(crearRamo(r)));
-     const fila = s <= 5 ? document.getElementById("fila-superior") : document.getElementById("fila-inferior");
-fila.appendChild(cont);
+      const fila = s <= 5 ? document.getElementById("fila-superior") : document.getElementById("fila-inferior");
+      fila.appendChild(cont);
+    }
 
     actualizarBloqueos();
   </script>
